@@ -1,6 +1,6 @@
-const countIncrements = depthMeasurements => depthMeasurements.reduce((count, measurement, measurementIndex, allMeasurements) => {
-  const nextMeasurement = allMeasurements[measurementIndex+1]
-  return nextMeasurement && measurement < nextMeasurement ? count + 1 : count
+const countIncrements = depthMeasurements => depthMeasurements.slice(0, depthMeasurements.length - 1).reduce((count, measurement, measurementIndex) => {
+  const nextMeasurement = depthMeasurements[measurementIndex+1]
+  return measurement < nextMeasurement ? count + 1 : count
 }, 0)
 
 const sum = (...measurements) => measurements.reduce((acc, measurement) => acc + measurement)
