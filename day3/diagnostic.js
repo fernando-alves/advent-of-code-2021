@@ -11,14 +11,46 @@ const readingFromMostFrequentBits = readings => traverse(readings).reduce((resul
   return result.concat(mostFrequentBit);
 }, '');
 
+const toInt = binary => parseInt(binary, 2)
+
 const powerConsumption = readings => {
   const mostFrequentReading = readingFromMostFrequentBits(readings)
-  const gammaRate = parseInt(mostFrequentReading, 2)
-  const epsilonRate = parseInt(flip(mostFrequentReading), 2)
+  const gammaRate = toInt(mostFrequentReading)
+  const epsilonRate = toInt(flip(mostFrequentReading))
 
   return gammaRate * epsilonRate
 }
 
+const bitToBeMatched = (readings, bitIndex, criteria) => {
+  const zeroBitCount = readings.map(reading => reading[bitIndex]).filter(bit => bit == '0').length
+  return criteria(zeroBitCount, readings.length)
+}
+
+const oxygenGeneratorRatingBitCriteria = (zeroBitCount, totalBitCount) => zeroBitCount > (totalBitCount/2) ? '0' : '1';
+
+const co2ScrubberRatingBitCriteria = (zeroBitCount, totalBitCount) => zeroBitCount > (totalBitCount/2) ? '1' : '0';
+
+const rating = (readings, bitCriteria) => {
+  let bitIndex = 0;
+  let availableReadings = [...readings]
+
+  while (availableReadings.length > 1) {
+    availableReadings = availableReadings.filter(reading => reading[bitIndex] === bitToBeMatched(availableReadings, bitIndex, bitCriteria))
+    bitIndex++
+  }
+
+  return toInt(availableReadings)
+}
+
+const oxygenGeneratorRating = readings => rating(readings, oxygenGeneratorRatingBitCriteria)
+
+const co2ScrubberRating = readings => rating(readings, co2ScrubberRatingBitCriteria)
+
+const lifeSupportRating = readings => oxygenGeneratorRating(readings) * co2ScrubberRating(readings)
+
 module.exports = {
-  powerConsumption
+  powerConsumption,
+  oxygenGeneratorRating,
+  co2ScrubberRating,
+  lifeSupportRating
 }
