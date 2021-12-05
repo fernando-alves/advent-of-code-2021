@@ -1,5 +1,7 @@
 const flip = bits => bits.split('').map(bit => bit == '0' ? '1' : '0').join('')
 
+const toDecimal = bits => parseInt(bits, 2)
+
 const traverse = readings => readings.reduce((result, reading)=> {
   reading.split('').forEach((bit, index) => result[index].push(bit))
   return result
@@ -11,12 +13,12 @@ const readingFromMostFrequentBits = readings => traverse(readings).reduce((resul
   return result.concat(mostFrequentBit);
 }, '');
 
-const toInt = binary => parseInt(binary, 2)
+
 
 const powerConsumption = readings => {
   const mostFrequentReading = readingFromMostFrequentBits(readings)
-  const gammaRate = toInt(mostFrequentReading)
-  const epsilonRate = toInt(flip(mostFrequentReading))
+  const gammaRate = toDecimal(mostFrequentReading)
+  const epsilonRate = toDecimal(flip(mostFrequentReading))
 
   return gammaRate * epsilonRate
 }
@@ -39,7 +41,7 @@ const rating = (readings, bitCriteria) => {
     bitIndex++
   }
 
-  return toInt(availableReadings)
+  return toDecimal(availableReadings)
 }
 
 const oxygenGeneratorRating = readings => rating(readings, oxygenGeneratorRatingBitCriteria)
