@@ -1,5 +1,5 @@
 const fs = require('fs/promises')
-const { play } = require('./bingo')
+const { play, lastWinner } = require('./bingo')
 
 const breakLines = buffer => buffer.toString().split('\n')
 
@@ -27,6 +27,7 @@ fs.readFile('input')
   .then(breakLines)
   .then(parse)
   .then(input => {
-    console.log(`Score: ${play(input.boards, input.drawnNumbers).score}`)
+    console.log(`Winner score: ${play(input.boards, input.drawnNumbers).score}`)
+    console.log(`Last winner score: ${lastWinner(input.boards, input.drawnNumbers).score}`)
   })
   .catch(console.error)

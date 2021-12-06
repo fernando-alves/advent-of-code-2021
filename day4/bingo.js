@@ -1,5 +1,4 @@
 const play = (boards, drawnNumbers) => {
-  console.log(boards)
   let markableBoards = boards.map(asMarkable)
   let winner
   let lastNumberIndex = 0
@@ -19,6 +18,38 @@ const play = (boards, drawnNumbers) => {
   }
 }
 
+const lastWinner = (boards, drawnNumbers) => {
+  let markableBoards = boards.map(asMarkable)
+  let lastWinner
+  let lastWinnerDrawn
+  let lastNumberIndex = 0
+
+  do {
+    const drawnNumber = drawnNumbers[lastNumberIndex]
+    markableBoards = markableBoards.map(board => mark(board, drawnNumber))
+    let [winners, boardsInPlay] = splitWinners(markableBoards)
+
+    if (winners.length > 0) {
+      lastWinner = winners[0]
+      lastWinnerDrawn = drawnNumber
+    }
+
+    markableBoards = boardsInPlay
+    lastNumberIndex++
+  } while(lastNumberIndex < drawnNumbers.length && markableBoards.length > 0)
+
+  return {
+    lastWinner,
+    score: score(lastWinner, lastWinnerDrawn)
+  }
+}
+
+const splitWinners = boards => {
+  const winners = []
+  const notWinners = []
+  boards.forEach(board => isWinner(board) ? winners.push(board) : notWinners.push(board))
+  return [winners, notWinners]
+}
 const asMarkable = board => board.map(row => row.map(number => ({ number, marked: false })))
 
 const mark = (board, number) => board.map(row => row.map(position => {
@@ -47,5 +78,6 @@ module.exports = {
   play,
   mark,
   asMarkable,
-  isWinner
+  isWinner,
+  lastWinner
 }
