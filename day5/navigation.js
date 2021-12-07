@@ -1,30 +1,16 @@
-const markLinearVents = linePoints => {
-  let board = initBoard()
-  return linePoints.filter(horizontalOrVerticalLine).reduce((board, point) => {
-    const [from, to] = point
-    const coordinateToBeMarked = traceLine(from, to)
-    return markPoints(board, coordinateToBeMarked)
-  }, board)
-}
+const markVents = linePoints => linePoints.reduce((board, point) => {
+  const [from, to] = point
+  const coordinateToBeMarked = traceLine(from, to)
+  return markPoints(board, coordinateToBeMarked)
+}, initBoard())
 
-const markAllVents = linePoints => {
-  let board = initBoard()
-  return linePoints.filter(horizontalVerticalAndDiagonalLine).reduce((board, point) => {
-    const [from, to] = point
-    const coordinateToBeMarked = traceLine(from, to)
-    return markPoints(board, coordinateToBeMarked)
-  }, board)
-}
+const markAllVents = linePoints => markVents(linePoints.filter(horizontalVerticalAndDiagonalLine))
 
-const countOverlapingPoints = (linePoints, mark) => {
-  const board = mark(linePoints)
-  return board.reduce((count, line) => count + countOverlapingPointsInLine(line), 0)
-}
+const markLinearVents = linePoints => markVents(linePoints.filter(horizontalOrVerticalLine))
 
-const countOverlapingPointsInLine = line => line.reduce((count, point) => {
-  if (point.lineCount > 1) count++
-  return count
-}, 0)
+const countOverlapingPoints = (linePoints, mark) => mark(linePoints).reduce((count, line) => count + countOverlapingPointsInLine(line), 0)
+
+const countOverlapingPointsInLine = line => line.reduce((count, point) => (point.lineCount > 1) ? count+1 : count, 0)
 
 const initBoard = () => Array.from({length: 1000}, () => Array.from({length: 1000}, () => ({lineCount: 0})))
 
@@ -39,11 +25,7 @@ const traceLine = (from, to) => {
   const yIncrements = range(to.y - from.y)
   const longestIncrement = xIncrements.length > yIncrements.length ? xIncrements : yIncrements
 
-  return longestIncrement.reduce((points, _, i) => {
-    const xIncrement = xIncrements[i] || 0
-    const yIncrement = yIncrements[i] || 0
-    return points.concat({x: from.x + xIncrement, y: from.y + yIncrement})
-  }, [])
+  return longestIncrement.reduce((points, _, i) => points.concat({x: from.x + (xIncrements[i] || 0), y: from.y + (yIncrements[i] || 0)}), [])
 }
 
 const range = (delta) => {
@@ -53,8 +35,7 @@ const range = (delta) => {
 }
 
 const markPoints = (board, points) => points.reduce((markedBoard, point) => {
-  const lineCount = board[point.x][point.y].lineCount
-  markedBoard[point.x][point.y].lineCount = lineCount +1
+  markedBoard[point.x][point.y].lineCount++
   return markedBoard
 }, board)
 
