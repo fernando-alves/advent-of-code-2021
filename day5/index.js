@@ -1,5 +1,5 @@
 const fs = require('fs/promises')
-const { parseLinePoints, countOverlapingPoints } = require('./navigation.js')
+const { parseLinePoints, countLinearOverlapingPoints, countAllOverlapingPoints } = require('./navigation.js')
 
 const breakLines = buffer => buffer.toString().split('\n')
 
@@ -9,6 +9,7 @@ fs.readFile('input')
   .then(breakLines)
   .then(parse)
   .then(linePoints => {
-    console.log(`Count: ${countOverlapingPoints(linePoints)}`)
+    console.log(`Count linear: ${countLinearOverlapingPoints(linePoints)}`)
+    console.log(`Count all: ${countAllOverlapingPoints(linePoints)}`)
   })
   .catch(console.error)
