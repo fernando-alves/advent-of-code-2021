@@ -1,5 +1,5 @@
 const test = require('ava')
-const { simulate, countShoalSize } = require('./shoal.js')
+const { simulate, shoalSize } = require('./shoal.js')
 
 test('lanternfish internal timer decreses after a day', t => {
   const shoal = simulate([9])
@@ -47,47 +47,47 @@ test('simulates a shoal for 18 days', t => {
 })
 
 test('counts shoal size starting from a single fish and no reproduction', t => {
-  const size = countShoalSize([1])
+  const size = shoalSize([1])
   t.is(size, 1)
 })
 
 test('counts shoal size starting from a single fish in begining of the cycle that reproduces', t => {
-  const size = countShoalSize([6], 7)
+  const size = shoalSize([6], 7)
   t.is(size, simulate([6], 7).length)
 })
 
 test('counts shoal size starting from a single fish the middle of the cycle that reproduces', t => {
-  const size = countShoalSize([3], 7)
+  const size = shoalSize([3], 7)
   t.is(size, 2)
 })
 
 test('counts shoal size starting from fish in different cyles and no reproduction', t => {
-  const size = countShoalSize([6, 5], 3)
+  const size = shoalSize([6, 5], 3)
   t.is(size, 2)
 })
 
 test('counts shoal size starting from a fish about to reproduce', t => {
-  const size = countShoalSize([0], 1)
+  const size = shoalSize([0], 1)
   t.is(size, 2)
 })
 
 test('counts shoal size starting from a fish that reproduces multiple times', t => {
-  const size = countShoalSize([0], 15)
+  const size = shoalSize([0], 15)
   const result = simulate([0], 15)
   t.is(size, result.length)
 })
 
 test('counts shoal size starting from fish in different cyles and a single reproduction', t => {
-  const size = countShoalSize([6, 0], 3)
+  const size = shoalSize([6, 0], 3)
   t.is(size, simulate([6, 0], 3).length)
 })
 
 test('counts shoal size starting from fish in different cyles and multiple reproduction', t => {
-  const size = countShoalSize([6, 0, 3], 15)
+  const size = shoalSize([6, 0, 3], 15)
   t.is(size, simulate([6, 0, 3], 15).length)
 })
 
 test('counts correctly after 18 days', t => {
-  const size = countShoalSize([3, 4, 3, 1, 2], 18)
+  const size = shoalSize([3, 4, 3, 1, 2], 18)
   t.deepEqual(size, simulate([3, 4, 3, 1, 2], 18).length)
 })

@@ -1,34 +1,8 @@
-const simulate = (shoal, days=1) => Array.from({length: days}).reduce(s => {
-  return simulateDayInShoal(s)
-}
-, shoal)
+const DAYS_UNTIL_REPRODUCTION = 7
+const NEW_BORN_TIMER = 8
+const STARTING_TIMER = 6
 
-const countShoalSize = (shoal, days=1) => {
-  const timerOccurrences = occurrences(shoal)
-  return Object.keys(occurrences(shoal)).reduce((total, timer) => (total + (timerOccurrences[timer] * count(Number(timer), days)))
-  , 0)
-}
-
-const count = (timer, remainingDays) => {
-  if (timer >= remainingDays) return 1
-  const firstChildWillBornAt = remainingDays - timer -1
-  const subsequentChild = range(firstChildWillBornAt / 7)
-  const self = 1
-  const firstBornCount = count(8, firstChildWillBornAt)
-  const others =  subsequentChild.reduce((total, generation) => {
-    const remainingDays = (firstChildWillBornAt - (7 * (generation+1)))
-    return total + count(8, remainingDays)
-  }, 0)
-  return self + firstBornCount + others
-}
-
-const occurrences = shoal => shoal.reduce((acc, timer) => {
-  const timerAsNumber = Number(timer)
-  acc[timerAsNumber] = acc[timerAsNumber] ? acc[timerAsNumber] + 1 : 1
-  return acc
-}, {});
-
-const range = n => Array.from({length: n}, (_, i) => i)
+const simulate = (shoal, days=1) => Array.from({length: days}).reduce(simulateDayInShoal, shoal)
 
 const simulateDayInShoal = shoal => shoal.reduce((shoal, _, index) => {
   let [timer, newBorn] = advanceTimer(shoal[index])
@@ -37,17 +11,30 @@ const simulateDayInShoal = shoal => shoal.reduce((shoal, _, index) => {
   return shoal
 }, shoal)
 
-const advanceTimer = timer => {
-  timer--
-  let newBorn
-  if (timer < 0) {
-    timer = 6
-    newBorn = 8
-  }
-  return [timer, newBorn]
+const advanceTimer = timer => --timer < 0 ? [STARTING_TIMER, NEW_BORN_TIMER] : [timer]
+
+const shoalSize = (shoal, days=1) => Object.entries(occurrences(shoal)).reduce((total, [timer, occurrences]) => (total + (occurrences * count(timer, days))), 0)
+
+const count = (timer, remainingDays) => {
+  if (timer >= remainingDays) return 1
+  const startOfReproductionCyle = remainingDays - timer - 1
+  const generations = range(Math.floor(startOfReproductionCyle / DAYS_UNTIL_REPRODUCTION) + 1)
+  return 1 + countDecendents(startOfReproductionCyle, generations)
 }
+
+const countDecendents = (startingDay, generations) => generations.reduce((total, generation) =>
+total + count(NEW_BORN_TIMER, remainingDaysInGeneration(startingDay, generation)), 0)
+
+const remainingDaysInGeneration = (startingDays, generation) => (startingDays - (DAYS_UNTIL_REPRODUCTION * (generation)))
+
+const occurrences = shoal => shoal.reduce((acc, timer) => {
+  acc[timer] = acc[timer] ? acc[timer] + 1 : 1
+  return acc
+}, {});
+
+const range = n => Array.from({length: n}, (_, i) => i)
 
 module.exports = {
   simulate,
-  countShoalSize
+  shoalSize
 }
