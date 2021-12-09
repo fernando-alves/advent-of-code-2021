@@ -1,10 +1,9 @@
-const constantFuelCost = positions =>positions.reduce((chepeast, position) => {
-    const costOfCurrentPosition = cost(position, positions)
-    return costOfCurrentPosition < chepeast ? costOfCurrentPosition : chepeast
+const fuelCost = (crabsPositions, costCalculator) => allPossiblePositions(crabsPositions).reduce((cheapest, position) => {
+  const costOfCurrentPosition = costCalculator(position, crabsPositions)
+  return costOfCurrentPosition < cheapest ? costOfCurrentPosition : cheapest
   }, Infinity)
 
-
-const cost = (position, otherPositions) => otherPositions.reduce((result, other) => result + Math.abs((other - position)), 0)
+const constantCost = (position, otherPositions) => otherPositions.reduce((result, other) => result + Math.abs(other - position), 0)
 
 const incrementalCost = (position, otherPositions) => otherPositions.reduce((result, other) => {
   const n = Math.abs(other - position)
@@ -16,12 +15,7 @@ const allPossiblePositions = positions => range([...positions].sort((a,b) => a-b
 
 const range = n => Array.from({length: n}, (_, i) => i)
 
-const incrementalFuelCost = crabsPositions => allPossiblePositions(crabsPositions).reduce((cheapest, position) => {
-  const costOfCurrentPosition = incrementalCost(position, crabsPositions)
-  return costOfCurrentPosition < cheapest ? costOfCurrentPosition : cheapest
-}, Infinity)
-
 module.exports = {
-  constantFuelCost,
-  incrementalFuelCost
+  constantFuelCost: crabsPositions => fuelCost(crabsPositions, constantCost),
+  incrementalFuelCost: crabsPositions => fuelCost(crabsPositions, incrementalCost)
 }
